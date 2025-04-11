@@ -9,6 +9,7 @@ Hosted on GitHub Pages: [View Live](https://your-username.github.io/demo-app/)
 
 ## 📂 Project Structure
 
+```
 src/
 ├── app/
 │   ├── counter/
@@ -19,6 +20,7 @@ src/
 ├── assets/
 │   └── todo.png
 └── index.html
+```
 
 ## 🛠️ Features
 
@@ -32,7 +34,7 @@ src/
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/demo-app.git
+git clone https://github.com/Rahulrgd/demo-app.git
 cd demo-app
 npm install
 ng serve
