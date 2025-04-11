@@ -1,6 +1,49 @@
-<div
-  class="d-flex flex-column justify-content-center align-items-center vh-100"
->
-  <h1>{{ count }}</h1>
-  <button (click)="onClick()" class="btn btn-primary mt-3">Increment</button>
+<div class="container">
+  <h1>Add Todos</h1>
+  <form>
+    <div class="mb-3">
+      <label for="exampleInputEmail1" class="form-label">Title</label>
+      <input
+        [(ngModel)]="newTodo.title"
+        name="title"
+        type="text"
+        class="form-control"
+        id="exampleInputEmail1"
+        aria-describedby="emailHelp"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="exampleInputPassword1" class="form-label">Description</label>
+      <input
+        [(ngModel)]="newTodo.description"
+        name="description"
+        type="text"
+        class="form-control"
+        id="exampleInputPassword1"
+      />
+    </div>
+    <div class="d-flex justify-content-end">
+      <button (click)="addTodo()" type="button" class="btn btn-primary">
+        Add
+      </button>
+    </div>
+  </form>
+</div>
+
+<hr class="m-5" />
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="mb-3" *ngFor="let todo of todos; let i = index">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ todo.title }}</h5>
+          <p class="card-text">{{ todo.description }}</p>
+          <div class="d-flex justify-content-end">
+            <a (click)="deleteTodo(i)" class="btn btn-danger ms-3">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
