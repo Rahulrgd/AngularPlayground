@@ -1,15 +1,13 @@
-// todo.model.ts
-export class Todo {
+export class Note {
   public readonly createdAt: Date;
   public updatedAt: Date;
-  public completed: boolean;
-  public id?: number; // optional
+  public id?: number;
 
   constructor(
     public title: string,
+    public description: string | any  // allows HTML or Quill Delta
   ) {
     this.createdAt = new Date();
     this.updatedAt = new Date();
-    this.completed = false;
   }
 }

@@ -1,16 +1,6 @@
-<div>
-  <div *ngIf="componentVisibility" class="alert alert-success d-flex justify-content-center" role="alert">
-    Todo created successfully!
-  </div>
-  <div *ngIf="deleteTodoAlert" class="alert alert-danger d-flex justify-content-center" role="alert">
-    Todo deleted: {{deletedTodoTitle}}
-  </div>
-</div>
-<div class="container">
-  <h1>Add Todos</h1>
-  <form>
-    <div class="mb-3">
-      <label for="exampleInputEmail1" class="form-label">Title</label>
+<div class="container mt-4">
+  <form class="row g-2 align-items-center">
+    <div class="col">
       <input
         [(ngModel)]="newTodo.title"
         name="title"
@@ -19,53 +9,84 @@
         required
         type="text"
         class="form-control"
-        id="exampleInputEmail1"
-        aria-describedby="emailHelp"
+        placeholder="Write your todo"
       />
       <div class="text-danger mt-1" *ngIf="titleRef.invalid && titleRef.touched">
         <small *ngIf="titleRef.errors?.['required']">Title is required.</small>
-        <small *ngIf="titleRef.errors?.['minlength']">Title must be at least 3 characters.</small>
+        <small *ngIf="titleRef.errors?.['minlength']">
+          Title must be at least 3 characters.
+        </small>
       </div>
     </div>
-    <div class="mb-3">
-      <label for="exampleInputPassword1" class="form-label">Description</label>
-      <input
-        [(ngModel)]="newTodo.description"
-        name="description"
-        minlength="5"
-        required
-        #descRef="ngModel"
-        type="text"
-        class="form-control"
-        id="exampleInputPassword1"
-      />
-      <div class="text-danger mt-1" *ngIf="descRef.invalid && descRef.touched">
-        <small *ngIf="descRef.errors?.['required']">Description is required.</small>
-        <small *ngIf="descRef.errors?.['minlength']">Description must be at least 5 characters.</small>
-      </div>
-    </div>
-    <div class="d-flex justify-content-end">
-      <button [disabled]="titleRef.invalid || descRef.invalid" (click)="addTodo()" type="button" class="btn btn-primary">
+  
+    <div class="col-auto">
+      <button
+        [disabled]="titleRef.invalid"
+        (click)="addTodo()"
+        type="button"
+        class="btn btn-primary"
+      >
         Add
       </button>
     </div>
   </form>
+  
 </div>
 
 <hr class="m-5" />
 
+<div>
+  <div
+    *ngIf="componentVisibility"
+    class="alert alert-success d-flex justify-content-center"
+    role="alert"
+  >
+    Todo created successfully!
+  </div>
+  <div
+    *ngIf="deleteTodoAlert"
+    class="alert alert-danger d-flex justify-content-center"
+    role="alert"
+  >
+    Todo deleted: {{ deletedTodoTitle }}
+  </div>
+</div>
+
 <div class="container mt-4">
-  <div class="row">
-    <div class="mb-3" *ngFor="let todo of todos; let i = index">
-      <div class="card h-100">
-        <div class="card-body">
-          <h5 class="card-title">{{ todo.title }}</h5>
-          <p class="card-text">{{ todo.description }}</p>
-          <div class="d-flex justify-content-end">
-            <a (click)="deleteTodo(i, todo.title)" class="btn btn-danger ms-3">Delete</a>
-          </div>
-        </div>
-      </div>
+  <div
+    class="row mt-4"
+    *ngFor="let todo of todos; let i = index"
+    style="align-items: center"
+  >
+    <div class="col-auto">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        [(ngModel)]="todo.completed"
+      />
+    </div>
+
+    <div class="col">
+      <p
+        class="mb-0"
+        [ngClass]="{
+          'text-decoration-line-through text-muted': todo.completed
+        }"
+      >
+        {{ todo.title }}
+      </p>
+    </div>
+
+    <div class="col-auto">
+      <button class="btn btn-sm btn-primary" (click)="editTodo(i, todo.title)">
+        <i class="bi bi-pencil"></i>
+      </button>
+    </div>
+
+    <div class="col-auto">
+      <button class="btn btn-sm btn-danger" (click)="deleteTodo(i, todo.title)">
+        <i class="bi bi-trash"></i>
+      </button>
     </div>
   </div>
 </div>

@@ -10,7 +10,10 @@ import { LocalDbService } from './local-db.service';
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.css',
 })
-export class TodoComponent implements OnInit{
+export class TodoComponent implements OnInit {
+  editTodo(index: number, title: string) {
+    this.newTodo.title = title;
+  }
 
   todos: Todo[] = [];
 
@@ -23,19 +26,16 @@ export class TodoComponent implements OnInit{
   async loadTodos() {
     this.todos = await this.db.getTodos();
   }
-  
-  
 
   newTodo = {
-    title: '',
-    description: '',
+    title: ''
   };
 
   componentVisibility = false;
 
   showTodoAddedAlert() {
     this.componentVisibility = true;
-  
+
     // Auto-hide after 3 seconds (optional)
     setTimeout(() => {
       this.componentVisibility = false;
@@ -44,24 +44,23 @@ export class TodoComponent implements OnInit{
 
   async addTodo(): Promise<void> {
     const todo = new Todo(
-      this.newTodo.title,
-      this.newTodo.description,
-      new Date()
+      this.newTodo.title
+      // this.newTodo.description,
+      // new Date()
     );
-  
-    await this.db.addTodo(todo);   // Save to database
-    await this.loadTodos();        // Refresh list from DB
-  
+
+    await this.db.addTodo(todo); // Save to database
+    await this.loadTodos(); // Refresh list from DB
+
     console.log('Todo added to local database');
     this.showTodoAddedAlert();
-  
+
     // Reset form fields
     this.newTodo.title = '';
-    this.newTodo.description = '';
   }
 
-  deletedTodoTitle = "";
-  deleteTodoAlert= false;
+  deletedTodoTitle = '';
+  deleteTodoAlert = false;
 
   showTodoDeletedAlert() {
     this.deleteTodoAlert = true;
@@ -73,14 +72,13 @@ export class TodoComponent implements OnInit{
   }
 
   async deleteTodo(index: number, title: string): Promise<void> {
-  const todoToDelete = this.todos[index];
+    const todoToDelete = this.todos[index];
 
-  if (todoToDelete.id) {
-    await this.db.deleteTodo(todoToDelete.id); // Delete from DB
-    await this.loadTodos();                    // Refresh list
-    this.deletedTodoTitle = title;
-    this.showTodoDeletedAlert();
+    if (todoToDelete.id) {
+      await this.db.deleteTodo(todoToDelete.id); // Delete from DB
+      await this.loadTodos(); // Refresh list
+      this.deletedTodoTitle = title;
+      this.showTodoDeletedAlert();
+    }
   }
-}
-
 }
