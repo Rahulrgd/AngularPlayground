@@ -5,7 +5,7 @@ A learning project built using Angular 15+, designed to explore and demonstrate 
 
 ## 🚀 Live Demo
 
-Hosted on GitHub Pages: [View Live](https://your-username.github.io/demo-app/)
+Hosted on GitHub Pages: [View Live](https://rahulrgd.github.io/AngularPlayground/)
 
 ## 📂 Project Structure
 

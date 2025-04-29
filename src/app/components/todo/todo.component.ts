@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Todo } from '../model/todo.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LocalDbService } from './local-db.service';
 
 @Component({
   selector: 'app-todo',
@@ -9,62 +10,21 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.css',
 })
-export class TodoComponent {
+export class TodoComponent implements OnInit{
+
+  todos: Todo[] = [];
+
+  constructor(private db: LocalDbService) {}
+
+  ngOnInit() {
+    this.loadTodos();
+  }
+
+  async loadTodos() {
+    this.todos = await this.db.getTodos();
+  }
   
-  todos: Todo[] = [
-    {
-      title: 'Complete Typescript Tutorial',
-      description:
-        'Make list of important topics and complete them one by one.',
-      date: new Date(),
-    },
-    {
-      title: 'Read Angular Docs',
-      description: 'Focus on standalone components and routing setup.',
-      date: new Date(new Date().setDate(new Date().getDate() - 1)),
-    },
-    {
-      title: 'Build a Counter App',
-      description:
-        'Use Angular basics: binding, event handling, and components.',
-      date: new Date(new Date().setDate(new Date().getDate() - 2)),
-    },
-    {
-      title: 'Watch RxJS Basics Video',
-      description: 'Understand observables and simple operators.',
-      date: new Date(new Date().setDate(new Date().getDate() - 3)),
-    },
-    {
-      title: 'Practice Angular Forms',
-      description: 'Try both template-driven and reactive forms.',
-      date: new Date(new Date().setDate(new Date().getDate() - 4)),
-    },
-    {
-      title: 'Make a Todo App',
-      description: 'Add, display, and delete todo items using a list.',
-      date: new Date(new Date().setDate(new Date().getDate() - 5)),
-    },
-    {
-      title: 'Learn Angular Services',
-      description: 'Create and inject a service to manage todos.',
-      date: new Date(new Date().setDate(new Date().getDate() - 6)),
-    },
-    {
-      title: 'Explore Angular CLI',
-      description: 'Use CLI to generate components and services quickly.',
-      date: new Date(new Date().setDate(new Date().getDate() - 7)),
-    },
-    {
-      title: 'Understand Routing Guards',
-      description: 'Apply `canActivate` to protect routes.',
-      date: new Date(new Date().setDate(new Date().getDate() - 8)),
-    },
-    {
-      title: 'Deploy Angular App',
-      description: 'Try hosting on Firebase or GitHub Pages.',
-      date: new Date(new Date().setDate(new Date().getDate() - 9)),
-    },
-  ];
+  
 
   newTodo = {
     title: '',
@@ -82,14 +42,22 @@ export class TodoComponent {
     }, 3000);
   }
 
-  addTodo(): void {
-    this.todos.push({
-      title: this.newTodo.title,
-      description: this.newTodo.description,
-      date: new Date(),
-    });
-    console.log('todo is added');
+  async addTodo(): Promise<void> {
+    const todo = new Todo(
+      this.newTodo.title,
+      this.newTodo.description,
+      new Date()
+    );
+  
+    await this.db.addTodo(todo);   // Save to database
+    await this.loadTodos();        // Refresh list from DB
+  
+    console.log('Todo added to local database');
     this.showTodoAddedAlert();
+  
+    // Reset form fields
+    this.newTodo.title = '';
+    this.newTodo.description = '';
   }
 
   deletedTodoTitle = "";
@@ -104,9 +72,15 @@ export class TodoComponent {
     }, 3000);
   }
 
-  deleteTodo(index: number, title: string): void {
-    this.todos.splice(index, 1);
-    this.deletedTodoTitle=title;
+  async deleteTodo(index: number, title: string): Promise<void> {
+  const todoToDelete = this.todos[index];
+
+  if (todoToDelete.id) {
+    await this.db.deleteTodo(todoToDelete.id); // Delete from DB
+    await this.loadTodos();                    // Refresh list
+    this.deletedTodoTitle = title;
     this.showTodoDeletedAlert();
   }
+}
+
 }
