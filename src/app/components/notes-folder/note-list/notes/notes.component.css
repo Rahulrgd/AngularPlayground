@@ -1,0 +1,27 @@
+/* Force toolbar into a single line with horizontal scroll */
+.ql-toolbar.ql-snow {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+  
+  /* Prevent wrapping inside groups */
+  .ql-toolbar.ql-snow .ql-formats {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  /* Optional scrollbar styling */
+  .ql-toolbar.ql-snow::-webkit-scrollbar {
+    height: 6px;
+  }
+  .ql-toolbar.ql-snow::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 3px;
+  }
+  

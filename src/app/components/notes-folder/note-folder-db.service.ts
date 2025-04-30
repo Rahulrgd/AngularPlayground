@@ -22,6 +22,14 @@ export class NoteFolderDbService extends Dexie {
       notes: '++id, title, createdAt, updatedAt'
     });
 
+    this.version(2).stores({
+      folders: '++id, folderName, createdAt, updatedAt',
+      noteLists: '++id, name, createdAt, updatedAt, folderId',
+      notes: '++id, title, createdAt, updatedAt, noteListId' // ✅ Include this
+    });
+    
+    
+
     this.folders = this.table('folders');
     this.noteLists = this.table('noteLists');
     this.notes = this.table('notes');
@@ -62,6 +70,10 @@ export class NoteFolderDbService extends Dexie {
     return await this.noteLists.where('folderId').equals(folderId).toArray();
   }
 
+  async getNoteListById(noteListId: number): Promise<NoteList | undefined> {
+    return await this.noteLists.get(noteListId);
+  }  
+
   async updateNoteList(id: number, name: string): Promise<void> {
     await this.noteLists.update(id, { name, updatedAt: new Date() });
   }
@@ -75,12 +87,12 @@ export class NoteFolderDbService extends Dexie {
   }
 
   // NOTE METHODS
-  async addNote(listId: number, note: Note): Promise<number> {
-    // note.createdAt = new Date();
+  async addNote(noteListId: number, note: Note): Promise<number> {
+    note.noteListId = noteListId;
     note.updatedAt = new Date();
-    (note as any).noteListId = listId;
     return await this.notes.add(note);
   }
+  
 
   async getNotes(listId: number): Promise<Note[]> {
     return await this.notes.where('noteListId').equals(listId).toArray();

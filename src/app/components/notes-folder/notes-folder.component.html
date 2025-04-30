@@ -1,78 +1,192 @@
 <div class="sidebar bg-light p-3">
-    <h5 class="mb-3">Note Manager</h5>
-  
-    <!-- Alert -->
-    <div *ngIf="showAlert" class="alert alert-success text-center" role="alert">
-      Folder created successfully!
+  <h5 class="mb-3">Note Manager</h5>
+
+  <!-- Alert -->
+  <div *ngIf="showAlert" class="alert alert-success text-center" role="alert">
+    Folder created successfully!
+  </div>
+
+  <!-- Folder Form in Grid Format -->
+  <div class="d-grid gap-2 mb-3">
+    <div class="d-flex">
+      <input
+        [(ngModel)]="folderName"
+        name="folderName"
+        required
+        minlength="3"
+        #folderNameRef="ngModel"
+        type="text"
+        placeholder="Enter folder name"
+        (keydown.enter)="createFolder()"
+        class="form-control me-2"
+      />
+      <button
+        [disabled]="folderNameRef.invalid"
+        class="btn btn-primary"
+        (click)="createFolder()"
+      >
+        Create Folder
+      </button>
     </div>
-  
-    <!-- Folder Form in Grid Format -->
-    <div class="d-grid gap-2 mb-3">
-      <div class="d-flex">
-        <input
-          [(ngModel)]="folderName"
-          name="folderName"
-          required
-          minlength="3"
-          #folderNameRef="ngModel"
-          type="text"
-          placeholder="Enter folder name"
-          class="form-control me-2"
-        />
-        <button
-          [disabled]="folderNameRef.invalid"
-          class="btn btn-primary"
-          (click)="createFolder()"
+    <div
+      class="text-danger"
+      *ngIf="folderNameRef.invalid && folderNameRef.touched"
+    >
+      <small *ngIf="folderNameRef.errors?.['required']"
+        >Folder name is required.</small
+      >
+      <small *ngIf="folderNameRef.errors?.['minlength']"
+        >Minimum 3 characters.</small
+      >
+    </div>
+  </div>
+
+  <!-- Note Folder List -->
+  <div *ngFor="let folder of notesFolders">
+    <div class="card my-2">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <span
+          (click)="toggleFolder(folder.id)"
+          class="folder-name fw-bold"
+          role="button"
         >
-          Create Folder
-        </button>
+          {{ folder.folderName }}
+        </span>
+        <div>
+          <button
+            class="btn btn-sm btn-success me-1"
+            (click)="folder.id ? openNoteListModal(folder.id) : null"
+            data-bs-toggle="modal"
+            data-bs-target="#noteListModal"
+          >
+            Add Note List
+          </button>
+
+          <button
+            class="btn btn-sm btn-primary me-1"
+            (click)="editFolder(folder)"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="deleteFolder(folder.id)"
+          >
+            Delete
+          </button>
+        </div>
       </div>
-      <div class="text-danger" *ngIf="folderNameRef.invalid && folderNameRef.touched">
-        <small *ngIf="folderNameRef.errors?.['required']">Folder name is required.</small>
-        <small *ngIf="folderNameRef.errors?.['minlength']">Minimum 3 characters.</small>
-      </div>
-    </div>
-  
-    <!-- Note Folder List -->
-    <div *ngFor="let folder of notesFolders">
-      <div class="card my-2">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <span (click)="toggleFolder(folder.id)" class="folder-name fw-bold" role="button">
-            {{ folder.folderName }}
-          </span>
-          <div>
-            <button class="btn btn-sm btn-success me-1" (click)="addNoteList(folder.id)">Add Note List</button>
-            <button class="btn btn-sm btn-primary me-1" (click)="editFolder(folder)">Edit</button>
-            <button class="btn btn-sm btn-danger" (click)="deleteFolder(folder.id)">Delete</button>
+
+      <div class="card-body" *ngIf="folder.expanded">
+        <div *ngFor="let noteList of folder.notesList">
+          <div class="mb-2 d-flex justify-content-between">
+            <span
+              (click)="openNoteList(noteList)"
+              class="text-decoration-underline"
+              role="button"
+            >
+              {{ noteList.name }}
+            </span>
+            <div>
+              <button
+                class="btn btn-sm btn-success me-1"
+                routerLink="/notes"
+                [queryParams]="{ listId: noteList.id, listName: noteList.name }"
+              >
+                Add Note
+              </button>
+              <button
+                class="btn btn-sm btn-primary me-1"
+                (click)="editNoteList(noteList)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-sm btn-danger"
+                (click)="deleteNoteList(noteList)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="noteList.expanded" class="ps-3">
+            <div
+              *ngFor="let note of noteList.notes"
+              class="d-flex justify-content-between"
+            >
+              <span
+                (click)="openNote(note)"
+                class="text-secondary"
+                role="button"
+                >{{ note.title }}</span
+              >
+              <div>
+                <button
+                  class="btn btn-sm btn-primary me-1"
+                  (click)="editNote(note)"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteNote(note)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-  
-        <!-- <div class="card-body" *ngIf="folder.expanded">
-          <div *ngFor="let noteList of folder.notesList">
-            <div class="mb-2 d-flex justify-content-between">
-              <span (click)="openNoteList(noteList)" class="text-decoration-underline" role="button">
-                {{ noteList.name }}
-              </span>
-              <div>
-                <button class="btn btn-sm btn-success me-1" (click)="addNote(noteList)">Add Note</button>
-                <button class="btn btn-sm btn-primary me-1" (click)="editNoteList(noteList)">Edit</button>
-                <button class="btn btn-sm btn-danger" (click)="deleteNoteList(noteList)">Delete</button>
-              </div>
-            </div>
-  
-            <div *ngIf="noteList.expanded" class="ps-3">
-              <div *ngFor="let note of noteList.notes" class="d-flex justify-content-between">
-                <span (click)="openNote(note)" class="text-secondary" role="button">{{ note.title }}</span>
-                <div>
-                  <button class="btn btn-sm btn-primary me-1" (click)="editNote(note)">Edit</button>
-                  <button class="btn btn-sm btn-danger" (click)="deleteNote(note)">Delete</button>
-                </div>
-              </div>
-            </div>
-  
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
-  
+</div>
+
+<!-- Note List Modal -->
+<div
+  class="modal fade"
+  id="noteListModal"
+  tabindex="-1"
+  aria-labelledby="noteListModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="noteListModalLabel">Create Note List</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitNoteList()" #noteListForm="ngForm">
+          <div class="mb-3">
+            <label for="noteListName" class="form-label">Note List Name</label>
+            <input
+              type="text"
+              id="noteListName"
+              class="form-control"
+              [(ngModel)]="newNoteListName"
+              name="noteListName"
+              minlength="3"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="btn btn-success"
+            [disabled]="noteListForm.invalid"
+          >
+            Save
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

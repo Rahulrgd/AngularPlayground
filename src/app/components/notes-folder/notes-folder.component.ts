@@ -5,20 +5,23 @@ import { Note } from '../model/note.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteFolderDbService } from './note-folder-db.service';
+import { RouterModule } from '@angular/router';
+
+declare let bootstrap: any;
 
 @Component({
   selector: 'app-notes-folder',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './notes-folder.component.html',
-  styleUrls: ['./notes-folder.component.css']
+  styleUrls: ['./notes-folder.component.css'],
 })
 export class NotesFolderComponent implements OnInit {
   folderName: string = '';
   notesFolders: NotesFolder[] = [];
   showAlert: boolean = false;
 
-  constructor(private dbService: NoteFolderDbService) {}
+  constructor(private readonly dbService: NoteFolderDbService) {}
 
   async ngOnInit() {
     await this.loadFolders();
@@ -34,12 +37,12 @@ export class NotesFolderComponent implements OnInit {
   }
 
   toggleFolder(folderId?: number): void {
-    const folder = this.notesFolders.find(f => f.id === folderId);
+    const folder = this.notesFolders.find((f) => f.id === folderId);
     if (folder) folder['expanded'] = !folder['expanded'];
   }
 
   async addNoteList(folderId?: number): Promise<void> {
-    const folder = this.notesFolders.find(f => f.id === folderId);
+    const folder = this.notesFolders.find((f) => f.id === folderId);
     if (folder) {
       const listName = prompt('Enter Note List Name:');
       if (listName && listName.length >= 3) {
@@ -51,14 +54,53 @@ export class NotesFolderComponent implements OnInit {
     }
   }
 
-  async addNote(noteList: NoteList): Promise<void> {
-    const noteTitle = prompt('Enter Note Title:');
-    const noteDesc = prompt('Enter Note Description:');
-    if (noteTitle && noteTitle.length >= 3 && noteDesc && noteDesc.length >= 5) {
-      const newNote = new Note(noteTitle, noteDesc);
+  selectedFolderId: number | null = null;
+  newNoteListName: string = '';
+
+  openNoteListModal(folderId: number): void {
+    this.selectedFolderId = folderId;
+    this.newNoteListName = '';
+  }
+
+  async submitNoteList(): Promise<void> {
+    if (!this.selectedFolderId || this.newNoteListName.length < 3) return;
+
+    const folder = this.notesFolders.find(
+      (f) => f.id === this.selectedFolderId
+    );
+    if (folder) {
+      const newList = new NoteList(this.newNoteListName);
+      const listId = await this.dbService.addNoteList(folder.id!, newList);
+      newList.id = listId;
+      folder.notesList.push(newList);
+    }
+    // Close modal manually
+    const modalEl = document.getElementById('noteListModal');
+    if (modalEl) {
+      const modal =
+        bootstrap.Modal.getInstance(modalEl) ?? new bootstrap.Modal(modalEl);
+      modal.hide();
+    }
+  }
+
+  async addNote(noteList: NoteList, title: string, description: string): Promise<void> {
+    // const noteTitle = prompt('Enter Note Title:');
+    // const noteDesc = prompt('Enter Note Description:');
+    const noteTitle = title;
+    const noteDesc = description;
+
+    if (
+      noteTitle !== null &&
+      noteDesc !== null &&
+      noteTitle.length >= 3 &&
+      noteDesc.length >= 5
+    ) {
+      const newNote = new Note(noteTitle, noteDesc, noteList.id!);
       const noteId = await this.dbService.addNote(noteList.id!, newNote);
       newNote.id = noteId;
       noteList.notes.push(newNote);
+    } else {
+      alert('Title must be at least 3 characters and description at least 5.');
     }
   }
 
@@ -81,7 +123,7 @@ export class NotesFolderComponent implements OnInit {
   async deleteFolder(folderId?: number): Promise<void> {
     if (!folderId) return;
     await this.dbService.deleteFolder(folderId);
-    this.notesFolders = this.notesFolders.filter(f => f.id !== folderId);
+    this.notesFolders = this.notesFolders.filter((f) => f.id !== folderId);
   }
 
   async editNoteList(noteList: NoteList): Promise<void> {
@@ -95,7 +137,7 @@ export class NotesFolderComponent implements OnInit {
   async deleteNoteList(noteList: NoteList): Promise<void> {
     await this.dbService.deleteNoteList(noteList.id!);
     for (let folder of this.notesFolders) {
-      folder.notesList = folder.notesList.filter(nl => nl.id !== noteList.id);
+      folder.notesList = folder.notesList.filter((nl) => nl.id !== noteList.id);
     }
   }
 
@@ -114,7 +156,7 @@ export class NotesFolderComponent implements OnInit {
     await this.dbService.deleteNote(note.id!);
     for (let folder of this.notesFolders) {
       for (let list of folder.notesList) {
-        list.notes = list.notes.filter(n => n.id !== note.id);
+        list.notes = list.notes.filter((n) => n.id !== note.id);
       }
     }
   }

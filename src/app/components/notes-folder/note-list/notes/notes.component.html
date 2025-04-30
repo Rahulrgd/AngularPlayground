@@ -40,16 +40,19 @@
     <div class="mb-3">
       <label for="noteDesc" class="form-label">Description</label>
 
-      <quill-editor
-        [(ngModel)]="note.description"
-        name="description"
-        [required]="true"
-        [minLength]="5"
-        #descRef="ngModel"
-        class="form-control"
-        id="noteDesc"
-        theme="snow"
-      ></quill-editor>
+      <div class="form-control">
+        <quill-editor
+          [(ngModel)]="note.description"
+          [modules]="modules"
+          name="description"
+          [required]="true"
+          [minLength]="5"
+          #descRef="ngModel"
+          id="noteDesc"
+          theme="snow"
+          style="height: 200px; width: 100%;"
+        ></quill-editor>
+      </div>
 
       <div class="text-danger mt-1" *ngIf="descRef.invalid && descRef.touched">
         <small *ngIf="descRef.errors?.['required']"

@@ -5,7 +5,8 @@ export class Note {
 
   constructor(
     public title: string,
-    public description: string | any  // allows HTML or Quill Delta
+    public description: string,
+    public noteListId: number
   ) {
     this.createdAt = new Date();
     this.updatedAt = new Date();

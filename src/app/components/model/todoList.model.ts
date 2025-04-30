@@ -7,6 +7,7 @@ export class TodoList{
         public readonly createdAt: Date,
         public updatedAt: Date,
         public id?: number,
+        public folderId?: number
     ){
         this.createdAt = new Date();
         this.updatedAt = new Date();
