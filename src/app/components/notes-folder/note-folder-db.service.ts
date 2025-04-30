@@ -35,9 +35,19 @@ export class NoteFolderDbService extends Dexie {
     this.notes = this.table('notes');
   }
 
+  async ensureAllNotesFolderExists(): Promise<NotesFolder> {
+    const existing = await this.folders.where('folderName').equals('AllNotesFolder').first();
+    if (existing) return existing;
+  
+    const allNotesFolder = new NotesFolder('AllNotesFolder');
+    const id = await this.addFolder(allNotesFolder);
+    allNotesFolder.id = id;
+    return allNotesFolder;
+  }
+  
+
   // FOLDER METHODS
   async addFolder(folder: NotesFolder): Promise<number> {
-    // folder.createdAt = new Date();
     folder.updatedAt = new Date();
     return await this.folders.add(folder);
   }

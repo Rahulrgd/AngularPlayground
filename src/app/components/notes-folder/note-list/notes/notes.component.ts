@@ -61,6 +61,10 @@ export class NotesComponent {
 
   async addNote(noteList: NoteList, title: string, description: string): Promise<void> {
 
+    if(this.noteListId===null){
+
+    }
+
     const noteTitle = title;
     const noteDesc = description;
 
@@ -78,6 +82,7 @@ export class NotesComponent {
       alert('Title must be at least 3 characters and description at least 5.');
     }
   }
+  
 
   async submitNote(): Promise<void> {
     const { title, description } = this.note;

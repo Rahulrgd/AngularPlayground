@@ -24,6 +24,8 @@ export class NotesFolderComponent implements OnInit {
   constructor(private readonly dbService: NoteFolderDbService) {}
 
   async ngOnInit() {
+    await this.dbService.ensureAllNotesFolderExists(); // 👈 create if not exists
+    await this.loadFolders(); // existing logic
     await this.loadFolders();
   }
 
